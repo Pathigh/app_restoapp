@@ -1,19 +1,35 @@
-'use strict'
+const express = require('express');
+require('dotenv').config();
+const cors = require('cors')
 
-var mongoose = require('mongoose');
-var app = require('./app');
-var port = 3700;
 
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/RestApp',{useNewUrlParser: true, useUnifiedTopology: true })
-        .then(()=>{
-            console.log("Conexion a la base de datos establecida con exito...!");
+const { dbConnection } = require('./database/config');
 
-            // crear del servidor
-            app.listen(port,()=> {
-                console.log("Servidor Corriendo correctamente en la url: localhost:3700");
-            })
-        })
-        .catch(error => console.log(error));
+// Crear el servidor de express
+const app = express();
+
+// Configurar CORS
+app.use( cors() );
+
+// Lectura y parseo del body
+app.use( express.json() );
+
+// Base de datos
+dbConnection();
+
+
+// Rutas
+app.use( '/api/usuarios', require('./routes/usuarios') );
+//app.use( '/api/login', require('./routes/auth') );
+
+
+
+app.listen( process.env.PORT, () => {
+    console.log('Servidor corriendo en puerto ' + process.env.PORT );
+});
+
+
+
+
 
 
